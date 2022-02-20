@@ -26,9 +26,7 @@ namespace VisualPinball.Unity
 		public float3 Position;
 		public float3 EventPosition; // m_lastEventPos
 		public float3 Velocity;
-		public float3 AngularVelocity;
 		public float3 AngularMomentum;
-		public float3x3 Orientation;
 		public float Radius;
 		public float Mass;
 		public bool IsFrozen;
@@ -49,6 +47,14 @@ namespace VisualPinball.Unity
 					Position.z - vl,
 					Position.z + vl
 				);
+			}
+		}
+
+		public float3 AngularVelocity
+		{
+			get {
+				var avl = AngularMomentum / Inertia;
+				return avl;
 			}
 		}
 

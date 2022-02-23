@@ -16,6 +16,7 @@
 
 using Unity.Entities;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace VisualPinball.Unity
 {
@@ -24,6 +25,7 @@ namespace VisualPinball.Unity
 	{
 		public int Id;
 		public float3 Position;
+		public Quaternion Rotation;
 		public float3 EventPosition; // m_lastEventPos
 		public float3 Velocity;
 		public float3 AngularMomentum;

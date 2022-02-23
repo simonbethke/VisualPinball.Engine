@@ -15,8 +15,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 using Unity.Entities;
-using Unity.Mathematics;
 using Unity.Profiling;
+using UnityEngine;
 
 namespace VisualPinball.Unity
 {
@@ -49,7 +49,10 @@ namespace VisualPinball.Unity
 				//Logger.Debug($"Ball {ball.Id} Position = {ball.Position}");
 
 				ball.Position += ball.Velocity * dTime;
-
+				
+				var vel = ball.AngularVelocity;
+				var vecVel = new Vector3(vel.x, vel.y, vel.z);
+				ball.Rotation = Quaternion.AngleAxis(vecVel.magnitude, vecVel) * ball.Rotation;
 
 				marker.End();
 

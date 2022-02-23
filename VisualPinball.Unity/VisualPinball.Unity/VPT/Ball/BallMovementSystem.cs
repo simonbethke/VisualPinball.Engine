@@ -61,10 +61,7 @@ namespace VisualPinball.Unity
 
 				var ballTransform = _player.Balls[entity].transform;
 				ballTransform.localPosition = new Vector3(ball.Position.x, ball.Position.y, zHeight);
-
-				var vel = ball.AngularVelocity;
-
-				ballTransform.localRotation = Quaternion.FromToRotation(Vector3.up, new Vector3(vel.x, vel.y, vel.z));
+				ballTransform.localRotation = ball.Rotation;
 
 				marker.End();
 

@@ -109,6 +109,7 @@ namespace VisualPinball.Unity
 				Id = id,
 				IsFrozen = kickerEntity != Entity.Null,
 				Position = localPos,
+				Rotation = Quaternion.identity,
 				Radius = radius,
 				Mass = mass,
 				Velocity = localVel,

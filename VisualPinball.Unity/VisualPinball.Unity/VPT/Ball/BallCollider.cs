@@ -15,6 +15,7 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 using Unity.Mathematics;
+using UnityEngine;
 using VisualPinball.Engine.Common;
 using Random = Unity.Mathematics.Random;
 
@@ -135,16 +136,18 @@ namespace VisualPinball.Unity
 		{
 			// surface contact point relative to center of mass
 			var surfP = -ball.Radius * hitNormal;
+			// sb: surfVel is the absolute velocity in global space that the contact point of the ball is moving
 			var surfVel = BallData.SurfaceVelocity(in ball, in surfP);
 
 			// calc the tangential slip velocity
-			var slip = surfVel - hitNormal * math.dot(surfVel, hitNormal);
+			var slip = surfVel - ball.Velocity; //hitNormal * math.dot(surfVel, hitNormal);
 
 			var maxFriction = frictionCoeff * ball.Mass * -math.dot(gravity, hitNormal);
 
 			var slipSpeed = math.length(slip);
-			float3 slipDir;
+			float3 slipDirectionNormal;
 			float numer;
+			float friction;
 
 			var normVel = math.dot(ball.Velocity, hitNormal);
 			if (normVel <= 0.025 || slipSpeed < PhysicsConstants.Precision) {
@@ -159,22 +162,26 @@ namespace VisualPinball.Unity
 				if (math.lengthsq(slipAcc) < 1e-6) {
 					return;
 				}
+				
+				slipDirectionNormal = math.normalize(slipAcc);
 
-				slipDir = math.normalize(slipAcc);
-				numer = -math.dot(slipDir, surfAcc);
-
-			} else {
+				numer = -math.dot(surfAcc, slipDirectionNormal);
+				friction = math.clamp(numer * ball.Mass / 3.5f, -maxFriction, maxFriction);
+			}
+			else {
 				// nonzero slip speed - dynamic friction case
-				slipDir = slip / slipSpeed;
-				numer = -math.dot(slipDir, surfVel);
+				slipDirectionNormal = slip / slipSpeed;
+				numer = -math.dot(surfVel, slipDirectionNormal);
+				friction = math.clamp(numer * ball.Mass / 3.5f, -maxFriction, maxFriction);
 			}
 
-			var cp = math.cross(surfP, slipDir);
-			var denom = 1.0f / ball.Mass + math.dot(slipDir, math.cross(cp / ball.Inertia, surfP));
-			var friction = math.clamp(numer / denom, -maxFriction, maxFriction);
+			
+			Debug.Log($"{slipSpeed}");
 
 			if (!float.IsNaN(friction) && !float.IsInfinity(friction)) {
-				ball.ApplySurfaceImpulse(dTime * friction * cp, dTime * friction * slipDir);
+				ball.ApplySurfaceImpulse(
+					dTime * friction * math.cross(surfP, slipDirectionNormal), 
+					dTime * friction * slipDirectionNormal);
 			}
 		}
 
